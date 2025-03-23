@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YouTube Downloader</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f2f5; text-align: center; margin-top: 10%; }
+        h1 { color: #333; }
+        form { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); display: inline-block; }
+        input[type="text"] { padding: 8px; width: 300px; }
+        input[type="submit"] { padding: 8px 15px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        .error { color: red; margin-top: 10px; }
+        .progress-container { width: 100%; background-color: #ddd; margin-top: 20px; border-radius: 5px; }
+        .progress-bar { width: 0%; height: 30px; background-color: #4CAF50; text-align: center; color: white; line-height: 30px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>YouTube Video Downloader</h1>
+    <form method="POST">
+        <input type="text" name="link" placeholder="Enter YouTube link" required>
+        <input type="submit" value="Download" onclick="startProgress()">
+    </form>
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar">0%</div>
+    </div>
+
+    <script>
+        function startProgress() {
+            const progressBar = document.getElementById("progress-bar");
+
+            function updateProgress() {
+                fetch('/progress')
+                    .then(response => response.json())
+                    .then(data => {
+                        progressBar.style.width = data.progress;
+                        progressBar.textContent = data.progress;
+
+                        if (data.status !== "completed") {
+                            setTimeout(updateProgress, 500);  // Continue updating progress
+                        } else {
+                            alert("Download complete!");
+                        }
+                    });
+            }
+
+            updateProgress();
+        }
+    </script>
+</body>
+</html>
